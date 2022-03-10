@@ -1,6 +1,7 @@
 package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
@@ -117,6 +118,8 @@ public class App {
         for (User user: userService.getAllUsers()){
             System.out.println(user.getId()+"   "+user.getUsername());
         }
+
+        
         //Need to catch the input
         consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel):");
         consoleService.promptForBigDecimal("Enter amount:");
