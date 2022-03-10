@@ -1,9 +1,13 @@
 package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
+import com.techelevator.tenmo.services.UserService;
+
+import java.math.BigDecimal;
 
 public class App {
 
@@ -11,8 +15,10 @@ public class App {
 
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
-
     private AuthenticatedUser currentUser;
+    private UserService userService= new UserService(API_BASE_URL);
+
+
 
     public static void main(String[] args) {
         App app = new App();
@@ -38,6 +44,7 @@ public class App {
             } else if (menuSelection != 0) {
                 System.out.println("Invalid Selection");
                 consoleService.pause();
+
             }
         }
     }
@@ -55,6 +62,7 @@ public class App {
     private void handleLogin() {
         UserCredentials credentials = consoleService.promptForCredentials();
         currentUser = authenticationService.login(credentials);
+        userService.setCurrentUser(currentUser);
         if (currentUser == null) {
             consoleService.printErrorMessage();
         }
@@ -85,7 +93,10 @@ public class App {
     }
 
 	private void viewCurrentBalance() {
-		// TODO Auto-generated method stub
+        String token=currentUser.getToken();
+        BigDecimal balance=userService.getBalance();
+        System.out.println("Your current account balance is: $"+balance);
+
 		
 	}
 
@@ -100,7 +111,15 @@ public class App {
 	}
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
+        System.out.println("------------------------ ");
+        System.out.println(" User ID           Name ");
+        System.out.println("------------------------ ");
+        for (User user: userService.getAllUsers()){
+            System.out.println(user.getId()+"   "+user.getUsername());
+        }
+        //Need to catch the input
+        consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel):");
+        consoleService.promptForBigDecimal("Enter amount:");
 		
 	}
 
@@ -108,5 +127,6 @@ public class App {
 		// TODO Auto-generated method stub
 		
 	}
+
 
 }
