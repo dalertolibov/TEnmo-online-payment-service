@@ -8,9 +8,7 @@ import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -42,7 +40,19 @@ public class Controller {
     }
     @GetMapping("transfers")
     public List<Transfer>allTransfers(Principal principal){
+
         return transferDao.allTransfers(principal.getName());
+    }
+
+
+    @PostMapping("transfers")
+    public Transfer createTransfer(@RequestBody Transfer newTransfer, Principal principal){
+        return transferDao.createTransfer(newTransfer, principal.getName());
+    }
+
+    @PostMapping("transfers/{transferId}")
+    public Transfer updateTransfer(@PathVariable Long transferId,@RequestBody Transfer transfer,Principal principal){
+        return transferDao.updateTransfer(transferId,transfer, principal.getName());
     }
 
 

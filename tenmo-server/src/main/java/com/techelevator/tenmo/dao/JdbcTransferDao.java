@@ -38,14 +38,14 @@ public class JdbcTransferDao implements TransferDao{
     }
 
     @Override
-    public Transfer updateTransfer(Transfer transfer, String userName) {
-        String sql=" UPDATE transfer SET transfer_type_id=?,transfer_status_id=?, account_from=?,account_to=?,amount=? " +
+    public Transfer updateTransfer(Long transferId,Transfer transfer, String userName) {
+        String sql="UPDATE transfer SET transfer_type_id=?,transfer_status_id=?, account_from=?,account_to=?,amount=? " +
                 "WHERE transfer_id=? AND " +
                 "(account_from=(SELECT account_id FROM tenmo_user JOIN account USING (user_id) WHERE username=?)" +
                 "OR(account_to=(SELECT account_id FROM tenmo_user JOIN account USING (user_id) WHERE username=?)))";
-        jdbcTemplate.update(sql,transfer.getTransferTypeId(),transfer.getTransferStatusId(),transfer.getToAccountId(),
-                transfer.getFromAccountId(),transfer.getAmount(),transfer.getTransferId(),userName,userName);
-        return getTransfer(transfer.getTransferId(),userName);
+        jdbcTemplate.update(sql,transfer.getTransferTypeId(),transfer.getTransferStatusId(),transfer.getFromAccountId(),
+                transfer.getToAccountId(),transfer.getAmount(),transferId,userName,userName);
+        return getTransfer(transferId,userName);
 
     }
 
@@ -65,7 +65,7 @@ public class JdbcTransferDao implements TransferDao{
 
     private Transfer mapRowToTransfer (SqlRowSet row){
         Transfer transfer=new Transfer();
-        transfer.setTransferId(row.getLong("trasnfer_id"));
+        transfer.setTransferId(row.getLong("transfer_id"));
         transfer.setTransferStatusId(row.getLong("transfer_status_id"));
         transfer.setTransferTypeId(row.getLong("transfer_type_id"));
         transfer.setFromAccountId(row.getLong("account_from"));
