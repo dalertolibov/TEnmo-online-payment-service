@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 public interface AccountDao {
     Account getAccountByUserName (String accountHolderName) throws AccountNotFoundException;
     Account getAccountByUserId(Long userId) throws AccountNotFoundException;
-    String getUserNameByAccountId(Long accountId);
+    String getUserNameByAccountId(Long accountId) throws AccountNotFoundException;
     Account getAccountByAccountId(Long accountId) throws AccountNotFoundException;
-    boolean updateBalance (Long accountId,BigDecimal amount);
+    boolean updateBalance (Long accountId,BigDecimal amount) throws AccountNotFoundException;
 
 
 }

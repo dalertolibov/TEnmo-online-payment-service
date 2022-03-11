@@ -25,7 +25,7 @@ public class JdbcAccountDao implements AccountDao {
         if(result.next()){
             return mapRowToAccount(result);
         }
-        else throw new AccountNotFoundException();
+        throw new AccountNotFoundException();
 
     }
 
@@ -35,9 +35,12 @@ public class JdbcAccountDao implements AccountDao {
         SqlRowSet result=jdbcTemplate.queryForRowSet(sql,userId);
         if(result.next()){
             return mapRowToAccount(result);
-        } else throw new AccountNotFoundException();
+        }
+        throw new AccountNotFoundException();
     }
-    public String getUserNameByAccountId(Long accountId)  {
+    public String getUserNameByAccountId(Long accountId) throws AccountNotFoundException {
+
+
         String sql="SELECT account_id,user_id,username,balance FROM account JOIN tenmo_user USING(user_id) WHERE account_id=?";
         return jdbcTemplate.queryForObject(sql,String.class,accountId);
     }
@@ -48,14 +51,19 @@ public class JdbcAccountDao implements AccountDao {
         SqlRowSet result=jdbcTemplate.queryForRowSet(sql,accountId);
         if(result.next()){
             return mapRowToAccount(result);
-        } else throw new AccountNotFoundException();
+        }
+        throw new AccountNotFoundException();
     }
 
     @Override
-    public boolean updateBalance(Long accountId,BigDecimal amount) {
+    public boolean updateBalance(Long accountId,BigDecimal amount) throws AccountNotFoundException {
+        boolean balanceUpdated=false;
         String sql="UPDATE account SET balance=? WHERE account_id=?";
-        return jdbcTemplate.update(sql,amount,accountId)==1;
-
+        balanceUpdated= jdbcTemplate.update(sql,amount,accountId)==1;
+        if(!balanceUpdated){
+            throw new AccountNotFoundException();
+        }
+        return balanceUpdated;
     }
 
 

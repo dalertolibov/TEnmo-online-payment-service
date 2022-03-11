@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.service;
 
 import com.techelevator.tenmo.Exeptions.AccountNotFoundException;
+import com.techelevator.tenmo.Exeptions.TransferNotFoundException;
 import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.dao.UserDao;
@@ -23,7 +24,7 @@ public class TransferService {
         this.accountDao = accountDao;
     }
  // not completed
-    public Transfer createTransfer (Transfer transfer,String userName) throws AccountNotFoundException {
+    public Transfer createTransfer (Transfer transfer,String userName) throws AccountNotFoundException, TransferNotFoundException {
         Long senderAccountId=transfer.getAccountFrom().getAccountId();
         Long receiverAccountId=transfer.getAccountTo().getAccountId();
 

@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.Exeptions.AccountNotFoundException;
+import com.techelevator.tenmo.Exeptions.TransferNotFoundException;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,46 +34,55 @@ public class JdbcTransferDao implements TransferDao{
     }
 
     @Override
-    public Transfer createTransfer(Transfer transfer, String userName) throws AccountNotFoundException {
+    public Transfer createTransfer(Transfer transfer, String userName) throws AccountNotFoundException, TransferNotFoundException {
+       Long newTransferId=null;
         String sql="INSERT INTO transfer VALUES (DEFAULT,?,?,?,?,?) RETURNING transfer_id";
-        Long newTransferId=jdbcTemplate.queryForObject(sql,Long.class,
+         newTransferId=jdbcTemplate.queryForObject(sql,Long.class,
                 transfer.getTransferTypeId(),
                 transfer.getTransferStatusId(),
                 transfer.getAccountFrom().getAccountId(),
                 transfer.getAccountTo().getAccountId(),
                 transfer.getAmount());
+         if(newTransferId==null){
+             throw new TransferNotFoundException();
+         }
         return getTransfer(newTransferId,userName);
     }
 
     @Override
-    public Transfer updateTransfer(Long transferId,Transfer transfer, String userName) throws AccountNotFoundException {
+    public Transfer updateTransfer(Long transferId,Transfer transfer, String userName) throws TransferNotFoundException, AccountNotFoundException {
+        boolean transferUpdated=false;
         String sql="UPDATE transfer SET transfer_type_id=?,transfer_status_id=?, account_from=?,account_to=?,amount=? " +
                 "WHERE transfer_id=? AND " +
                 "(account_from=(SELECT account_id FROM tenmo_user JOIN account USING (user_id) WHERE username=?)" +
                 "OR(account_to=(SELECT account_id FROM tenmo_user JOIN account USING (user_id) WHERE username=?)))";
-        jdbcTemplate.update(sql,
+        transferUpdated=jdbcTemplate.update(sql,
                 transfer.getTransferTypeId(),
                 transfer.getTransferStatusId(),
                 transfer.getAccountFrom().getAccountId(),
                 transfer.getAccountTo().getAccountId(),
                 transfer.getAmount(),
                 transferId,
-                userName,userName);
+                userName,userName)==1;
+        if(!transferUpdated){
+            throw new TransferNotFoundException();
+        }
         return getTransfer(transferId,userName);
 
     }
 
     @Override
-    public Transfer getTransfer(Long transferId, String userName) throws AccountNotFoundException {
-        Transfer transfer=null;
+    public Transfer getTransfer(Long transferId, String userName) throws TransferNotFoundException, AccountNotFoundException {
+
         String sql="SELECT * FROM transfer WHERE transfer_id=? AND " +
                 "(account_from=(SELECT account_id FROM tenmo_user JOIN account USING (user_id) WHERE username=?) " +
                 "OR(account_to=(SELECT account_id FROM tenmo_user JOIN account USING (user_id) WHERE username=?)));";
         SqlRowSet result=jdbcTemplate.queryForRowSet(sql,transferId,userName,userName);
         if(result.next()){
-            transfer=mapRowToTransfer(result);
+            return mapRowToTransfer(result);
         }
-        return transfer;
+        throw new TransferNotFoundException();
+
 
     }
 

@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.Exeptions.AccountNotFoundException;
+import com.techelevator.tenmo.Exeptions.TransferNotFoundException;
 import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.dao.UserDao;
@@ -49,14 +50,14 @@ public class Controller {
 
 
     @PostMapping("transfers")
-    public Transfer createTransfer(@RequestBody Transfer newTransfer, Principal principal) throws AccountNotFoundException {
+    public Transfer createTransfer(@RequestBody Transfer newTransfer, Principal principal) throws AccountNotFoundException, TransferNotFoundException {
 
 
         return transferService.createTransfer(newTransfer, principal.getName());
     }
 
     @PostMapping("transfers/{transferId}")
-    public Transfer updateTransfer(@PathVariable Long transferId,@RequestBody Transfer transfer,Principal principal) throws AccountNotFoundException {
+    public Transfer updateTransfer(@PathVariable Long transferId,@RequestBody Transfer transfer,Principal principal) throws AccountNotFoundException, TransferNotFoundException {
         return transferDao.updateTransfer(transferId,transfer, principal.getName());
     }
     @GetMapping("accounts/{userId}")
