@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.SortedMap;
 
 public class UserService {
 
@@ -25,6 +26,9 @@ public class UserService {
     public UserService(String baseUrl) {
         this.baseUrl=baseUrl;
     }
+
+
+
     public BigDecimal getBalance(){
         BigDecimal balance=null;
        try{
@@ -39,6 +43,14 @@ public class UserService {
        return balance;
 
     }
+    public void promptAllUsers(){
+        for(User user:getAllUsers()){
+            String formatedString=String.format("%-10d %s",user.getId(),user.getUsername().toUpperCase());
+            System.out.println(formatedString);
+        }
+    }
+
+
     public User[] getAllUsers (){
         User[]allUsers=null;
         try{
@@ -51,6 +63,29 @@ public class UserService {
             System.out.println("Server not accessible. Check your connection or try again.");
         }
         return allUsers;
+    }
+    public void promptForAllTransfers(){
+        if(getAllTransfer()==null){
+            System.out.println("You have no transfers");
+        }
+        else{
+            for(Transfer transfer:getAllTransfer()){
+                String senderUserNameFromTransfer=transfer.getAccountFrom().getAccountUser().getUsername();
+                String receiverUserNameFromTransfer=transfer.getAccountTo().getAccountUser().getUsername();
+
+                if(senderUserNameFromTransfer.equals(currentUser.getUser().getUsername())){
+                    String formatted=String.format("%-10d   To: %-17s $%.2f",transfer.getTransferId(),receiverUserNameFromTransfer.toUpperCase(),
+                            transfer.getAmount());
+                    System.out.println(formatted);
+                }
+                else{
+                    String formatted=String.format("%-10d From: %-17s $%.2f",transfer.getTransferId(),senderUserNameFromTransfer.toUpperCase(),
+                            transfer.getAmount());
+                    System.out.println(formatted);
+
+                }
+            }
+        }
     }
     public Transfer[] getAllTransfer() {
         Transfer[]allTransfers=null;
@@ -101,6 +136,7 @@ public class UserService {
         }
         return expected;
     }
+
 
     private HttpEntity<Transfer> makeTransferEntity(Transfer transfer) {
         HttpHeaders headers = new HttpHeaders();

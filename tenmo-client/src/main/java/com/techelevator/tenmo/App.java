@@ -93,44 +93,43 @@ public class App {
 	private void viewCurrentBalance() {
         String token=currentUser.getToken();
         BigDecimal balance=userService.getBalance();
-        System.out.println("Your current account balance is: $"+balance);
+        System.out.println("\nYour current account balance is: $"+balance);
 
 		
 	}
 
+
 	private void viewTransferHistory() {
-       for (Transfer transfer: userService.getAllTransfer()){
-           System.out.println(transfer.getTransferId()+" "+transfer.getAccountFrom().getAccountUser().getUsername()+" "+
-                   transfer.getAccountTo().getAccountUser().getUsername()+" "+transfer.getAmount());
-       }
+        consoleService.promptForListTransfers();
+        userService.promptForAllTransfers();
+
 
 		// TODO Auto-generated method stub
 		
 	}
 
 	private void viewPendingRequests() {
+        consoleService.promptForPendingRequests();
 		// TODO Auto-generated method stub
 		
 	}
 
 	private void sendBucks() {
-        System.out.println("------------------------ ");
-        System.out.println(" User ID           Name ");
-        System.out.println("------------------------ ");
-        for (User user: userService.getAllUsers()){
-            System.out.println(user.getId()+"   "+user.getUsername());
+        consoleService.promptForUsersList();
+        userService.promptAllUsers();
+        long userId= (consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel):"));
+        if(userId==0){
+            return;
         }
 
-
-
-       long userId= (consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel):"));
-       BigDecimal transferAmount= consoleService.promptForBigDecimal("Enter amount:");
+        BigDecimal transferAmount= consoleService.promptForBigDecimal("Enter amount:");
         Transfer transfer= userService.sendTransfer(userId,transferAmount);
         System.out.println("money sent to"+transfer.getTransferId());
 		
 	}
 
 	private void requestBucks() {
+        consoleService.promptForUsersList();
 		// TODO Auto-generated method stub
 		
 	}

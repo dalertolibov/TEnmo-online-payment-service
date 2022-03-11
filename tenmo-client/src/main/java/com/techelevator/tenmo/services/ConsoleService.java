@@ -45,6 +45,35 @@ public class ConsoleService {
         System.out.println("0: Exit");
         System.out.println();
     }
+    public void promptForUsersList(){
+        System.out.println("-------------------------------------------\n" +
+                "Users\n" +
+                "ID          Name\n" +
+                "-------------------------------------------");
+    }
+    public void promptForListTransfers(){
+        System.out.println("-------------------------------------------\n" +
+                "Transfers\n" +
+                "ID          From/To                 Amount\n" +
+                "-------------------------------------------");
+    }
+    public void promptForTransferDetails(){
+        System.out.println("--------------------------------------------\n" +
+            "Transfer Details\n" +
+            "--------------------------------------------");
+    }
+    public void promptForPendingRequests(){
+        System.out.println("-------------------------------------------\n" +
+                "Pending Transfers\n" +
+                "ID          To                     Amount\n" +
+                "-------------------------------------------");
+    }
+    public void promptForAcceptOrReject(){
+        System.out.println("1: Approve\n" +
+                "2: Reject\n" +
+                "0: Don't approve or reject\n" +
+                "---------");
+    }
 
     public UserCredentials promptForCredentials() {
         String username = promptForString("Username: ");
@@ -78,6 +107,7 @@ public class ConsoleService {
             }
         }
     }
+
 
 
     public void pause() {
