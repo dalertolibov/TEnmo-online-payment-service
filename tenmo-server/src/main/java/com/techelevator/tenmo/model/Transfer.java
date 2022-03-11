@@ -11,12 +11,9 @@ public class Transfer {
     @Min(value = 1L, message = "TransferId must be positive")
     private Long transferId;
 
-    @NotBlank
-    @Range(min = 1L,max=2L, message = "transferTypeId must be 1 or 2")
-    private Long transferTypeId;
-    @NotBlank
-    @Range(min = 1L,max=3L, message = "transferTypeId must be between 1 and 3")
-    private Long transferStatusId;
+    private TransferType type;
+
+    private TransferStatus status;
     @NotBlank
     private Account  accountFrom;
     @NotBlank
@@ -25,30 +22,27 @@ public class Transfer {
     @Min(value = 0, message = "Balance can't be negative")
     private BigDecimal amount;
 
-    public Long getTransferTypeId() {
-        return transferTypeId;
+    public TransferType getType() {
+        return type;
     }
 
-    public Long getTransferStatusId() {
-        return transferStatusId;
+    public void setType(TransferType type) {
+        this.type = type;
     }
 
+    public TransferStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TransferStatus status) {
+        this.status = status;
+    }
     public Long getTransferId() {
         return transferId;
     }
 
     public void setTransferId(Long transferId) {
         this.transferId = transferId;
-    }
-
-
-    public void setTransferTypeId(Long transferTypeId) {
-        this.transferTypeId = transferTypeId;
-    }
-
-
-    public void setTransferStatusId(Long transferStatusId) {
-        this.transferStatusId = transferStatusId;
     }
 
     public Account getAccountFrom() {

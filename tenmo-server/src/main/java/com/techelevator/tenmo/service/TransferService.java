@@ -3,11 +3,11 @@ package com.techelevator.tenmo.service;
 import com.techelevator.tenmo.Exeptions.AccountNotFoundException;
 import com.techelevator.tenmo.Exeptions.InsufficientFundException;
 import com.techelevator.tenmo.Exeptions.TransferNotFoundException;
-import com.techelevator.tenmo.dao.AccountDao;
-import com.techelevator.tenmo.dao.TransferDao;
-import com.techelevator.tenmo.dao.UserDao;
+import com.techelevator.tenmo.dao.*;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.TransferStatus;
+import com.techelevator.tenmo.model.TransferType;
 import jdk.jshell.spi.ExecutionControl;
 import org.springframework.stereotype.Component;
 
@@ -20,13 +20,18 @@ public class TransferService {
     private TransferDao transferDao;
     private UserDao userDao;
     private AccountDao accountDao;
+    private TransferTypeDao transferTypeDao;
+    private TransferStatusDao transferStatusDao;
 
-    public TransferService(TransferDao transferDao, UserDao userDao, AccountDao accountDao) {
+    public TransferService(TransferDao transferDao, UserDao userDao, AccountDao accountDao, TransferTypeDao transferTypeDao, TransferStatusDao transferStatusDao) {
         this.transferDao = transferDao;
         this.userDao = userDao;
         this.accountDao = accountDao;
+        this.transferTypeDao = transferTypeDao;
+        this.transferStatusDao = transferStatusDao;
     }
- // not completed
+
+    // not completed
     public Transfer createTransfer ( Transfer transfer, String userName) throws AccountNotFoundException, TransferNotFoundException, InsufficientFundException {
         Long senderAccountId=transfer.getAccountFrom().getAccountId();
         Long receiverAccountId=transfer.getAccountTo().getAccountId();
@@ -43,8 +48,9 @@ public class TransferService {
              accountDao.updateBalance(receiverAccountId,receiverBalance.add(transferAmount));
              transfer.setAccountFrom(senderAccount);
              transfer.setAccountTo(receiverAccount);
-             transfer.setTransferStatusId(1L);
-              createdTransfer=transferDao.createTransfer(transfer,userName);
+             transfer.setType(transferTypeDao.getTransferType("Send"));
+             transfer.setStatus(transferStatusDao.getTransferStatus("Approved"));
+             createdTransfer=transferDao.createTransfer(transfer,userName);
 
 
          }else {

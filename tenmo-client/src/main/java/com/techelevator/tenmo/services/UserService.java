@@ -1,9 +1,6 @@
 package com.techelevator.tenmo.services;
 
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.model.*;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
 import org.springframework.web.client.ResourceAccessException;
@@ -118,11 +115,10 @@ public class UserService {
     public Transfer sendTransfer(Long receiverId,BigDecimal transferAmount){
       //Need to make private method to create transfer
         Transfer transfer=new Transfer();
-        transfer.setTransferStatusId(2L);
-        transfer.setTransferTypeId(1L);
         transfer.setAccountFrom(getAccountByUserId(currentUser.getUser().getId()));
         transfer.setAccountTo(getAccountByUserId(receiverId));
         transfer.setAmount(transferAmount);
+
 
         Transfer expected =null;
         try{
