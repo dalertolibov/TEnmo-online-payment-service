@@ -6,6 +6,8 @@ import com.techelevator.tenmo.model.Account;
 public interface AccountDao {
     Account getAccountByUserName (String accountHolderName) throws AccountNotFoundException;
     Account getAccountByUserId(Long userId) throws AccountNotFoundException;
+    String getUserNameByAccountId(Long accountId);
+    Account getAccountByAccountId(Long accountId) throws AccountNotFoundException;
 
 
 }

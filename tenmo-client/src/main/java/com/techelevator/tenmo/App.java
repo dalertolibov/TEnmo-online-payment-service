@@ -102,6 +102,9 @@ public class App {
 	}
 
 	private void viewTransferHistory() {
+        for(Transfer transfer: userService.getAllTransfer()){
+            System.out.println(transfer.getAccountFrom().getAccountUser().getUsername());
+        }
 		// TODO Auto-generated method stub
 		
 	}
@@ -119,7 +122,7 @@ public class App {
             System.out.println(user.getId()+"   "+user.getUsername());
         }
 
-        
+
         //Need to catch the input
         consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel):");
         consoleService.promptForBigDecimal("Enter amount:");

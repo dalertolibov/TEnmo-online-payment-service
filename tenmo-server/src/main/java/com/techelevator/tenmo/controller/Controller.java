@@ -39,19 +39,19 @@ public class Controller {
         return accountDao.getAccountByUserName(principal.getName()).getBalance();
     }
     @GetMapping("transfers")
-    public List<Transfer>allTransfers(Principal principal){
+    public List<Transfer>allTransfers(Principal principal) throws AccountNotFoundException {
 
         return transferDao.allTransfers(principal.getName());
     }
 
 
     @PostMapping("transfers")
-    public Transfer createTransfer(@RequestBody Transfer newTransfer, Principal principal){
+    public Transfer createTransfer(@RequestBody Transfer newTransfer, Principal principal) throws AccountNotFoundException {
         return transferDao.createTransfer(newTransfer, principal.getName());
     }
 
     @PostMapping("transfers/{transferId}")
-    public Transfer updateTransfer(@PathVariable Long transferId,@RequestBody Transfer transfer,Principal principal){
+    public Transfer updateTransfer(@PathVariable Long transferId,@RequestBody Transfer transfer,Principal principal) throws AccountNotFoundException {
         return transferDao.updateTransfer(transferId,transfer, principal.getName());
     }
 
