@@ -4,7 +4,10 @@ import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
+import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -23,35 +26,80 @@ public class UserService {
         this.baseUrl=baseUrl;
     }
     public BigDecimal getBalance(){
-        ResponseEntity<BigDecimal> response=restTemplate.exchange(baseUrl+"balance",
-                HttpMethod.GET,makeAuthEntity(),BigDecimal.class);
-        return response.getBody();
+        BigDecimal balance=null;
+       try{
+           ResponseEntity<BigDecimal> response=restTemplate.exchange(baseUrl+"balance",
+                   HttpMethod.GET,makeAuthEntity(),BigDecimal.class);
+           balance=response.getBody();
+       } catch (RestClientResponseException ex) {
+           System.out.println("Request - Responce error: " + ex.getRawStatusCode());
+       } catch (ResourceAccessException e) {
+           System.out.println("Server not accessible. Check your connection or try again.");
+       }
+       return balance;
+
     }
     public User[] getAllUsers (){
-        ResponseEntity<User[]>response=restTemplate.exchange(baseUrl+"users",HttpMethod.GET,makeAuthEntity(),User[].class);
-        return response.getBody();
+        User[]allUsers=null;
+        try{
+            ResponseEntity<User[]>response=restTemplate.exchange(baseUrl+"users",HttpMethod.GET,makeAuthEntity(),User[].class);
+
+        allUsers= response.getBody();
+        } catch (RestClientResponseException ex) {
+            System.out.println("Request - Responce error: " + ex.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("Server not accessible. Check your connection or try again.");
+        }
+        return allUsers;
     }
     public Transfer[] getAllTransfer() {
+        Transfer[]allTransfers=null;
+        try{
         ResponseEntity<Transfer[]>response=restTemplate.exchange(baseUrl+"transfers",HttpMethod.GET,makeAuthEntity(),Transfer[].class);
-        return response.getBody();
+        allTransfers= response.getBody();
+        } catch (RestClientResponseException ex) {
+            System.out.println("Request - Responce error: " + ex.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("Server not accessible. Check your connection or try again.");
+        }
+        return allTransfers;
     }
+
+
     public Account getAccountByUserId(Long userId){
+        Account account=null;
+        try{
         ResponseEntity<Account> response=restTemplate.exchange(baseUrl+"accounts/"+userId,
                 HttpMethod.GET,makeAuthEntity(),Account.class);
-        return response.getBody();
+        account= response.getBody();
+        } catch (RestClientResponseException ex) {
+            System.out.println("Request - Responce error: " + ex.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("Server not accessible. Check your connection or try again.");
+        }
+        return account;
     }
+
     public Transfer sendTransfer(Long receiverId,BigDecimal transferAmount){
+      //Need to make private method to create transfer
         Transfer transfer=new Transfer();
         transfer.setTransferStatusId(2L);
         transfer.setTransferTypeId(1L);
         transfer.setAccountFrom(getAccountByUserId(currentUser.getUser().getId()));
         transfer.setAccountTo(getAccountByUserId(receiverId));
         transfer.setAmount(transferAmount);
-      ResponseEntity<Transfer>response=restTemplate.exchange(baseUrl+"transfers",HttpMethod.POST,
+
+        Transfer expected =null;
+        try{
+            ResponseEntity<Transfer>response=restTemplate.exchange(baseUrl+"transfers",HttpMethod.POST,
              makeTransferEntity(transfer),Transfer.class );
-      return response.getBody();
-
-
+         expected= response.getBody();
+        } catch (RestClientResponseException ex) {
+            System.out.println("Request - Responce error: " + ex.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("Server not accessible. Check your connection or try again.");
+        }
+        return expected;
     }
 
     private HttpEntity<Transfer> makeTransferEntity(Transfer transfer) {

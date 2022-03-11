@@ -1,14 +1,17 @@
 package com.techelevator.tenmo.service;
 
 import com.techelevator.tenmo.Exeptions.AccountNotFoundException;
+import com.techelevator.tenmo.Exeptions.InsufficientFundException;
 import com.techelevator.tenmo.Exeptions.TransferNotFoundException;
 import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.dao.UserDao;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
+import jdk.jshell.spi.ExecutionControl;
 import org.springframework.stereotype.Component;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -24,7 +27,7 @@ public class TransferService {
         this.accountDao = accountDao;
     }
  // not completed
-    public Transfer createTransfer (Transfer transfer,String userName) throws AccountNotFoundException, TransferNotFoundException {
+    public Transfer createTransfer ( Transfer transfer, String userName) throws AccountNotFoundException, TransferNotFoundException, InsufficientFundException {
         Long senderAccountId=transfer.getAccountFrom().getAccountId();
         Long receiverAccountId=transfer.getAccountTo().getAccountId();
 
@@ -38,11 +41,14 @@ public class TransferService {
 
              accountDao.updateBalance(senderAccountId,senderBalance.subtract(transferAmount));
              accountDao.updateBalance(receiverAccountId,receiverBalance.add(transferAmount));
+             transfer.setAccountFrom(senderAccount);
+             transfer.setAccountTo(receiverAccount);
+             transfer.setTransferStatusId(1L);
               createdTransfer=transferDao.createTransfer(transfer,userName);
 
 
          }else {
-             //Throw not Insufficient Fund Exception
+             throw new InsufficientFundException("You don't have enough TEmoney");
          }
          return createdTransfer;
 
