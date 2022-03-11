@@ -54,6 +54,11 @@ public class Controller {
     public Transfer updateTransfer(@PathVariable Long transferId,@RequestBody Transfer transfer,Principal principal) throws AccountNotFoundException {
         return transferDao.updateTransfer(transferId,transfer, principal.getName());
     }
+    @GetMapping("accounts/{userId}")
+    public Account account(@PathVariable Long userId) throws AccountNotFoundException {
+        return accountDao.getAccountByUserId(userId);
+    }
+
 
 
 

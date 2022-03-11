@@ -1,9 +1,6 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
 import com.techelevator.tenmo.services.UserService;
@@ -102,9 +99,11 @@ public class App {
 	}
 
 	private void viewTransferHistory() {
-        for(Transfer transfer: userService.getAllTransfer()){
-            System.out.println(transfer.getAccountFrom().getAccountUser().getUsername());
-        }
+       for (Transfer transfer: userService.getAllTransfer()){
+           System.out.println(transfer.getTransferId()+" "+transfer.getAccountFrom().getAccountUser().getUsername()+" "+
+                   transfer.getAccountTo().getAccountUser().getUsername()+" "+transfer.getAmount());
+       }
+
 		// TODO Auto-generated method stub
 		
 	}
@@ -123,9 +122,11 @@ public class App {
         }
 
 
-        //Need to catch the input
-        consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel):");
-        consoleService.promptForBigDecimal("Enter amount:");
+
+       long userId= (consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel):"));
+       BigDecimal transferAmount= consoleService.promptForBigDecimal("Enter amount:");
+        Transfer transfer= userService.sendTransfer(userId,transferAmount);
+        System.out.println("money sent to"+transfer.getTransferId());
 		
 	}
 

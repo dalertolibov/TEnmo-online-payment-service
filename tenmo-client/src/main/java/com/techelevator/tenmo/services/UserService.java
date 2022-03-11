@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.services;
 
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
@@ -34,13 +35,31 @@ public class UserService {
         ResponseEntity<Transfer[]>response=restTemplate.exchange(baseUrl+"transfers",HttpMethod.GET,makeAuthEntity(),Transfer[].class);
         return response.getBody();
     }
+    public Account getAccountByUserId(Long userId){
+        ResponseEntity<Account> response=restTemplate.exchange(baseUrl+"accounts/"+userId,
+                HttpMethod.GET,makeAuthEntity(),Account.class);
+        return response.getBody();
+    }
+    public Transfer sendTransfer(Long receiverId,BigDecimal transferAmount){
+        Transfer transfer=new Transfer();
+        transfer.setTransferStatusId(2L);
+        transfer.setTransferTypeId(1L);
+        transfer.setAccountFrom(getAccountByUserId(currentUser.getUser().getId()));
+        transfer.setAccountTo(getAccountByUserId(receiverId));
+        transfer.setAmount(transferAmount);
+      ResponseEntity<Transfer>response=restTemplate.exchange(baseUrl+"transfers",HttpMethod.POST,
+             makeTransferEntity(transfer),Transfer.class );
+      return response.getBody();
 
-//    private HttpEntity<User> makeAuctionEntity(Auction auction) {
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//        headers.setBearerAuth(authToken);
-//        return new HttpEntity<>(auction, headers);
-//    }
+
+    }
+
+    private HttpEntity<Transfer> makeTransferEntity(Transfer transfer) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(currentUser.getToken());
+        return new HttpEntity<>(transfer, headers);
+    }
 
     private HttpEntity<Void> makeAuthEntity() {
         HttpHeaders headers = new HttpHeaders();

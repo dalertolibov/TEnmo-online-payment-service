@@ -1,10 +1,13 @@
 package com.techelevator.tenmo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigDecimal;
 
 public class Account {
     private Long accountId;
     private User accountUser;
+    @JsonIgnore
     private BigDecimal balance;
 
     public Long getAccountId() {
