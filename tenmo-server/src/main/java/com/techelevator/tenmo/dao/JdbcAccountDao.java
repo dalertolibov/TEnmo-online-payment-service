@@ -7,6 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class JdbcAccountDao implements AccountDao {
     public JdbcAccountDao(JdbcTemplate jdbcTemplate) {
@@ -47,6 +49,13 @@ public class JdbcAccountDao implements AccountDao {
         if(result.next()){
             return mapRowToAccount(result);
         } else throw new AccountNotFoundException();
+    }
+
+    @Override
+    public boolean updateBalance(Long accountId,BigDecimal amount) {
+        String sql="UPDATE account SET balance=? WHERE account_id=?";
+        return jdbcTemplate.update(sql,amount,accountId)==1;
+
     }
 
 

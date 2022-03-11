@@ -22,21 +22,30 @@ public class TransferService {
         this.userDao = userDao;
         this.accountDao = accountDao;
     }
-    Transfer createTransfer (Long senderId, Long receiverId, BigDecimal transferAmount) throws AccountNotFoundException {
-        Transfer transfer=new Transfer();
-        Account senderAccount=new Account();
-        Account receiverAccount=new Account();
-        senderAccount=accountDao.getAccountByUserId(senderId);
-        receiverAccount=accountDao.getAccountByUserId(receiverId);
-        senderAccount.getBalance().subtract(transferAmount);
-        receiverAccount.getBalance().add(transferAmount);
+ // not completed
+    public Transfer createTransfer (Transfer transfer,String userName) throws AccountNotFoundException {
+        Long senderAccountId=transfer.getAccountFrom().getAccountId();
+        Long receiverAccountId=transfer.getAccountTo().getAccountId();
 
-        transfer.setAccountTo(receiverAccount);
-        transfer.setAccountFrom(senderAccount);
-        transfer.setAmount(transferAmount);
-        transfer.setTransferTypeId(1L);
-        transfer.setTransferStatusId(1L);
-        return transfer;
+        BigDecimal transferAmount= transfer.getAmount();
+        Account senderAccount=accountDao.getAccountByAccountId(senderAccountId);
+        Account receiverAccount=accountDao.getAccountByAccountId(receiverAccountId);
+        BigDecimal senderBalance= senderAccount.getBalance();
+        BigDecimal receiverBalance=receiverAccount.getBalance();
+        Transfer createdTransfer=null;
+         if (senderBalance.compareTo(transferAmount)==1){
+
+             accountDao.updateBalance(senderAccountId,senderBalance.subtract(transferAmount));
+             accountDao.updateBalance(receiverAccountId,receiverBalance.add(transferAmount));
+              createdTransfer=transferDao.createTransfer(transfer,userName);
+
+
+         }else {
+             //Throw not Insufficient Fund Exception
+         }
+         return createdTransfer;
+
+
 
     }
 }

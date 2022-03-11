@@ -7,6 +7,7 @@ import com.techelevator.tenmo.dao.UserDao;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.service.TransferService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,11 +22,13 @@ public class Controller {
     private UserDao userDao;
     private AccountDao accountDao;
     private TransferDao transferDao;
+    private TransferService transferService;
 
-    public Controller(UserDao userDao, AccountDao accountDao, TransferDao transferDao) {
+    public Controller(UserDao userDao, AccountDao accountDao, TransferDao transferDao,TransferService transferService) {
         this.userDao = userDao;
         this.accountDao = accountDao;
         this.transferDao = transferDao;
+        this.transferService=transferService;
     }
 
     @GetMapping("/users")
@@ -47,7 +50,9 @@ public class Controller {
 
     @PostMapping("transfers")
     public Transfer createTransfer(@RequestBody Transfer newTransfer, Principal principal) throws AccountNotFoundException {
-        return transferDao.createTransfer(newTransfer, principal.getName());
+
+
+        return transferService.createTransfer(newTransfer, principal.getName());
     }
 
     @PostMapping("transfers/{transferId}")
