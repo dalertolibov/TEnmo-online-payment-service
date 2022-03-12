@@ -75,14 +75,17 @@ public class JdbcTransferDao implements TransferDao{
 
     @Override
     public Transfer getTransfer(Long transferId, String userName) throws TransferNotFoundException, AccountNotFoundException {
-
-        String sql="SELECT * FROM transfer JOIN transfer_type USING (transfer_type_id) JOIN transfer_status USING (transfer_status_id) WHERE transfer_id=? AND " +
-                "(account_from=(SELECT account_id FROM tenmo_user JOIN account USING (user_id) WHERE username=?) " +
-                "OR(account_to=(SELECT account_id FROM tenmo_user JOIN account USING (user_id) WHERE username=?)));";
+Transfer transfer=null;
+        String sql="SELECT * FROM transfer JOIN transfer_type USING (transfer_type_id) " +
+                "JOIN transfer_status USING (transfer_status_id) WHERE transfer_id=? " +
+                "AND (account_from=(SELECT account_id FROM tenmo_user JOIN account USING " +
+                "(user_id) WHERE username=?)  OR(account_to=(SELECT account_id FROM " +
+                "tenmo_user JOIN account USING (user_id) WHERE username=?)))";
         SqlRowSet result=jdbcTemplate.queryForRowSet(sql,transferId,userName,userName);
-        if(result.next()){
-            return mapRowToTransfer(result);
-        }
+
+            if(result.next()){return transfer= mapRowToTransfer(result);}
+
+
         throw new TransferNotFoundException();
 
 

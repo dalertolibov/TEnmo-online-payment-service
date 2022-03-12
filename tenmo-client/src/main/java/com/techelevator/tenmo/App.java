@@ -86,7 +86,7 @@ public class App {
             } else {
                 System.out.println("Invalid Selection");
             }
-            consoleService.pause();
+           // consoleService.pause();
         }
     }
 
@@ -102,6 +102,13 @@ public class App {
 	private void viewTransferHistory() {
         consoleService.promptForListTransfers();
         userService.promptForAllTransfers();
+        long transferId=consoleService.promptForInt("Please enter transfer ID to view details (0 to cancel): ");
+        if(transferId==0){
+            return;
+        }
+        userService.promptTransferById(transferId);
+        consoleService.pause();
+
 
 
 		// TODO Auto-generated method stub
@@ -121,10 +128,12 @@ public class App {
         if(userId==0){
             return;
         }
-
         BigDecimal transferAmount= consoleService.promptForBigDecimal("Enter amount:");
         Transfer transfer= userService.sendTransfer(userId,transferAmount);
-       // System.out.println("money sent to"+transfer.getTransferId());
+
+        System.out.println("\nTransaction Successfully Completed!\n" +
+                "Transaction number: "+transfer.getTransferId()+"\nReceiver: "+
+                transfer.getAccountTo().getAccountUser().getUsername().toUpperCase());
 		
 	}
 

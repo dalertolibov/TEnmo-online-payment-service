@@ -50,6 +50,10 @@ public class Controller {
 
         return transferDao.allTransfers(principal.getName());
     }
+    @GetMapping("transfers/{transferId}")
+    public Transfer getTransferById(@PathVariable() Long transferId,Principal principal) throws TransferNotFoundException, AccountNotFoundException {
+       return  transferDao.getTransfer(transferId, principal.getName());
+    }
 
 
     @PostMapping("transfers")
@@ -61,9 +65,10 @@ public class Controller {
     }
      // Probably not needed
     @PostMapping("transfers/{id}")
-    public Transfer updateTransfer(@Valid @PathVariable("id") Long transferId,@RequestBody Transfer transfer,Principal principal) throws AccountNotFoundException, TransferNotFoundException {
+    public Transfer updateTransfer(@Valid @PathVariable(name="id") Long transferId,@RequestBody Transfer transfer,Principal principal) throws AccountNotFoundException, TransferNotFoundException {
         return transferDao.updateTransfer(transferId,transfer, principal.getName());
     }
+
     @GetMapping("accounts/{id}")
     public Account account(@PathVariable("id") Long userId) throws AccountNotFoundException {
         return accountDao.getAccountByUserId(userId);

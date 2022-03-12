@@ -8,6 +8,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.sql.SQLOutput;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -23,6 +24,7 @@ public class UserService {
     public UserService(String baseUrl) {
         this.baseUrl=baseUrl;
     }
+
 
 
 
@@ -70,17 +72,17 @@ public class UserService {
                 String senderUserNameFromTransfer=transfer.getAccountFrom().getAccountUser().getUsername();
                 String receiverUserNameFromTransfer=transfer.getAccountTo().getAccountUser().getUsername();
 
+                String formatted;
                 if(senderUserNameFromTransfer.equals(currentUser.getUser().getUsername())){
-                    String formatted=String.format("%-10d   To: %-17s $%.2f",transfer.getTransferId(),receiverUserNameFromTransfer.toUpperCase(),
+                    formatted = String.format("%-10d   To: %-17s $%.2f", transfer.getTransferId(), receiverUserNameFromTransfer.toUpperCase(),
                             transfer.getAmount());
-                    System.out.println(formatted);
                 }
                 else{
-                    String formatted=String.format("%-10d From: %-17s $%.2f",transfer.getTransferId(),senderUserNameFromTransfer.toUpperCase(),
+                    formatted = String.format("%-10d From: %-17s $%.2f", transfer.getTransferId(), senderUserNameFromTransfer.toUpperCase(),
                             transfer.getAmount());
-                    System.out.println(formatted);
 
                 }
+                System.out.println(formatted);
             }
         }
     }
@@ -96,8 +98,35 @@ public class UserService {
         }
         return allTransfers;
     }
+    public void promptTransferById(Long transferId){
+        Transfer expectedTransfer=getTransferById(transferId);
+
+        String senderName=expectedTransfer.getAccountFrom().getAccountUser().getUsername();
+        String receiverName=expectedTransfer.getAccountTo().getAccountUser().getUsername();
+        String currentUserName=currentUser.getUser().getUsername();
+
+        System.out.println(" Id:    "+expectedTransfer.getTransferId()) ;
+        if(senderName.equals(currentUserName)){
+
+        System.out.println(" From Me: "+senderName.toUpperCase());
+        System.out.println(" To:      " +receiverName.toUpperCase());
+        }else
+        {
+            System.out.println(" From : "+senderName.toUpperCase());
+            System.out.println(" To Me: " +receiverName.toUpperCase());
+        }
+        System.out.println(" Type:  " +expectedTransfer.getType().getTransferType());
+        System.out.println(" Status: " +expectedTransfer.getStatus().getTransferStatus());
+        System.out.println(" Amount: $"+expectedTransfer.getAmount());
 
 
+    }
+    public Transfer getTransferById(Long transferId){
+
+            ResponseEntity<Transfer>response=restTemplate.exchange(baseUrl+"transfers/"+transferId,
+                    HttpMethod.GET,makeAuthEntity(),Transfer.class);
+            return  response.getBody();
+    }
     public Account getAccountByUserId(Long userId){
         Account account=null;
         try{
@@ -112,14 +141,13 @@ public class UserService {
         return account;
     }
 
+
     public Transfer sendTransfer(Long receiverId,BigDecimal transferAmount){
-      //Need to make private method to create transfer
+     
         Transfer transfer=new Transfer();
         transfer.setAccountFrom(getAccountByUserId(currentUser.getUser().getId()));
         transfer.setAccountTo(getAccountByUserId(receiverId));
         transfer.setAmount(transferAmount);
-
-
         Transfer expected =null;
         try{
             ResponseEntity<Transfer>response=restTemplate.exchange(baseUrl+"transfers",HttpMethod.POST,
