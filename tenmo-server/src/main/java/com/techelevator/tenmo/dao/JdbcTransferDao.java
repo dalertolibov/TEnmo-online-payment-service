@@ -42,8 +42,8 @@ public class JdbcTransferDao implements TransferDao{
          newTransferId=jdbcTemplate.queryForObject(sql,Long.class,
                 transfer.getType().getTransferTypeId(),
                 transfer.getStatus().getTransferStatusId(),
-                transfer.getAccountFrom().getAccountId(),
-                transfer.getAccountTo().getAccountId(),
+                transfer.getSender().getAccountId(),
+                transfer.getReceiver().getAccountId(),
                 transfer.getAmount());
          if(newTransferId==null){
              throw new TransferNotFoundException();
@@ -61,8 +61,8 @@ public class JdbcTransferDao implements TransferDao{
         transferUpdated=jdbcTemplate.update(sql,
                 transfer.getType().getTransferTypeId(),
                 transfer.getStatus().getTransferStatusId(),
-                transfer.getAccountFrom().getAccountId(),
-                transfer.getAccountTo().getAccountId(),
+                transfer.getSender().getAccountId(),
+                transfer.getReceiver().getAccountId(),
                 transfer.getAmount(),
                 transferId,
                 userName,userName)==1;
@@ -104,8 +104,8 @@ Transfer transfer=null;
         transfer.setTransferId(row.getLong("transfer_id"));
         transfer.setStatus(status);
         transfer.setType(type);
-        transfer.setAccountFrom(accountDao.getAccountByAccountId(row.getLong("account_from")));
-        transfer.setAccountTo(accountDao.getAccountByAccountId(row.getLong("account_to")));
+        transfer.setSender(accountDao.getAccountByAccountId(row.getLong("account_from")));
+        transfer.setReceiver(accountDao.getAccountByAccountId(row.getLong("account_to")));
 
         return transfer;
     }

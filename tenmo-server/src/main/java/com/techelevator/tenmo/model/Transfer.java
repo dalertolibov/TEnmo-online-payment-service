@@ -15,9 +15,9 @@ public class Transfer {
 
     private TransferStatus status;
     @NotBlank
-    private Account  accountFrom;
+    private Account  sender;
     @NotBlank
-    private Account accountTo;
+    private Account receiver;
     @NotBlank
     @Min(value = 0, message = "Balance can't be negative")
     private BigDecimal amount;
@@ -45,20 +45,20 @@ public class Transfer {
         this.transferId = transferId;
     }
 
-    public Account getAccountFrom() {
-        return accountFrom;
+    public Account getSender() {
+        return sender;
     }
 
-    public void setAccountFrom(Account accountFrom) {
-        this.accountFrom = accountFrom;
+    public void setSender(Account sender) {
+        this.sender = sender;
     }
 
-    public Account getAccountTo() {
-        return accountTo;
+    public Account getReceiver() {
+        return receiver;
     }
 
-    public void setAccountTo(Account accountTo) {
-        this.accountTo = accountTo;
+    public void setReceiver(Account receiver) {
+        this.receiver = receiver;
     }
 
     public BigDecimal getAmount() {

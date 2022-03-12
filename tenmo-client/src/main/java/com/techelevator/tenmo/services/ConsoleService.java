@@ -45,7 +45,7 @@ public class ConsoleService {
         System.out.println("0: Exit");
         System.out.println();
     }
-    public void promptForUsersList(){
+    public void promptForUsersHeader(){
         System.out.println("-------------------------------------------\n" +
                 "Users\n" +
                 "ID          Name\n" +

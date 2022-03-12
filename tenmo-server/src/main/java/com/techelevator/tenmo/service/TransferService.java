@@ -33,8 +33,8 @@ public class TransferService {
 
     // not completed
     public Transfer createTransfer ( Transfer transfer, String userName) throws AccountNotFoundException, TransferNotFoundException, InsufficientFundException {
-        Long senderAccountId=transfer.getAccountFrom().getAccountId();
-        Long receiverAccountId=transfer.getAccountTo().getAccountId();
+        Long senderAccountId=transfer.getSender().getAccountId();
+        Long receiverAccountId=transfer.getReceiver().getAccountId();
 
         BigDecimal transferAmount= transfer.getAmount();
         Account senderAccount=accountDao.getAccountByAccountId(senderAccountId);
@@ -42,18 +42,28 @@ public class TransferService {
         BigDecimal senderBalance= senderAccount.getBalance();
         BigDecimal receiverBalance=receiverAccount.getBalance();
         Transfer createdTransfer=null;
-         if (senderBalance.compareTo(transferAmount)==1){
+         if (senderBalance.compareTo(transferAmount) > 0 && senderAccount.getAccountUser().getUsername().equals(userName)){
 
              accountDao.updateBalance(senderAccountId,senderBalance.subtract(transferAmount));
              accountDao.updateBalance(receiverAccountId,receiverBalance.add(transferAmount));
-             transfer.setAccountFrom(senderAccount);
-             transfer.setAccountTo(receiverAccount);
+             transfer.setSender(senderAccount);
+             transfer.setReceiver(receiverAccount);
              transfer.setType(transferTypeDao.getTransferType("Send"));
              transfer.setStatus(transferStatusDao.getTransferStatus("Approved"));
              createdTransfer=transferDao.createTransfer(transfer,userName);
+         }
+          else if( receiverAccount.getAccountUser().getUsername().equals(userName))
+          {
+              transfer.setSender(senderAccount);
+              transfer.setReceiver(receiverAccount);
+              transfer.setType(transferTypeDao.getTransferType("Request"));
+              transfer.setStatus(transferStatusDao.getTransferStatus("Pending"));
+              createdTransfer=transferDao.createTransfer(transfer,userName);
+
+        }
 
 
-         }else {
+         else {
              throw new InsufficientFundException("You don't have enough TEmoney");
          }
          return createdTransfer;

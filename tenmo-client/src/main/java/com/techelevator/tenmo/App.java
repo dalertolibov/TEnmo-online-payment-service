@@ -94,35 +94,39 @@ public class App {
         String token=currentUser.getToken();
         BigDecimal balance=userService.getBalance();
         System.out.println("\nYour current account balance is: $"+balance);
+    }
 
-		
-	}
-
-
-	private void viewTransferHistory() {
+    private void viewTransferHistory() {
         consoleService.promptForListTransfers();
-        userService.promptForAllTransfers();
+        userService.promptForApprovedTransfers();
         long transferId=consoleService.promptForInt("Please enter transfer ID to view details (0 to cancel): ");
         if(transferId==0){
             return;
         }
-        userService.promptTransferById(transferId);
+        userService.promptTransferDetails(transferId);
         consoleService.pause();
 
 
 
-		// TODO Auto-generated method stub
+
 		
 	}
 
 	private void viewPendingRequests() {
         consoleService.promptForPendingRequests();
-		// TODO Auto-generated method stub
+        userService.promptForPendingTransfers();
+        long transferId=consoleService.promptForInt("Please enter transfer ID to view details (0 to cancel): ");
+        if(transferId==0){
+            return;
+        }
+        userService.promptTransferDetails(transferId);
+        consoleService.pause();
+
 		
 	}
 
 	private void sendBucks() {
-        consoleService.promptForUsersList();
+        consoleService.promptForUsersHeader();
         userService.promptAllUsers();
         long userId= (consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel):"));
         if(userId==0){
@@ -133,13 +137,19 @@ public class App {
 
         System.out.println("\nTransaction Successfully Completed!\n" +
                 "Transaction number: "+transfer.getTransferId()+"\nReceiver: "+
-                transfer.getAccountTo().getAccountUser().getUsername().toUpperCase());
+                transfer.getReceiver().getAccountUser().getUsername().toUpperCase());
 		
 	}
 
 	private void requestBucks() {
-        consoleService.promptForUsersList();
-		// TODO Auto-generated method stub
+        consoleService.promptForUsersHeader();
+		userService.promptAllUsers();
+        long userId= (consoleService.promptForInt("Enter ID of user you are requesting from (0 to cancel):"));
+        if(userId==0){
+            return;
+        }
+        BigDecimal transferAmount= consoleService.promptForBigDecimal("Enter amount:");
+        Transfer transfer= userService.requestTransfer(userId,transferAmount);
 		
 	}
 

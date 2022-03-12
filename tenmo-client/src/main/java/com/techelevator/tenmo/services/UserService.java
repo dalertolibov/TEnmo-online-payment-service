@@ -1,16 +1,12 @@
 package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.*;
-import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.sql.SQLOutput;
-import java.util.List;
-import java.util.SortedMap;
 
 public class UserService {
 
@@ -44,8 +40,8 @@ public class UserService {
     }
     public void promptAllUsers(){
         for(User user:getAllUsers()){
-            String formatedString=String.format("%-10d %s",user.getId(),user.getUsername().toUpperCase());
-            System.out.println(formatedString);
+            String formattedString=String.format("%-10d %s",user.getId(),user.getUsername().toUpperCase());
+            System.out.println(formattedString);
         }
     }
 
@@ -63,29 +59,28 @@ public class UserService {
         }
         return allUsers;
     }
-    public void promptForAllTransfers(){
-        if(getAllTransfer()==null){
-            System.out.println("You have no transfers");
-        }
-        else{
-            for(Transfer transfer:getAllTransfer()){
-                String senderUserNameFromTransfer=transfer.getAccountFrom().getAccountUser().getUsername();
-                String receiverUserNameFromTransfer=transfer.getAccountTo().getAccountUser().getUsername();
 
-                String formatted;
-                if(senderUserNameFromTransfer.equals(currentUser.getUser().getUsername())){
-                    formatted = String.format("%-10d   To: %-17s $%.2f", transfer.getTransferId(), receiverUserNameFromTransfer.toUpperCase(),
-                            transfer.getAmount());
-                }
-                else{
-                    formatted = String.format("%-10d From: %-17s $%.2f", transfer.getTransferId(), senderUserNameFromTransfer.toUpperCase(),
-                            transfer.getAmount());
+    public void promptForApprovedTransfers(){
 
-                }
-                System.out.println(formatted);
+        for(Transfer transfer:getAllTransfer()){
+            boolean isTransferApproved=transfer.getStatus().getTransferStatus().equals("Approved");
+            if(isTransferApproved){
+                printTransfer(transfer);
             }
         }
     }
+    public void promptForPendingTransfers(){
+        for(Transfer transfer:getAllTransfer()){
+            boolean isTransferPending=transfer.getStatus().getTransferStatus().equals("Pending");
+            if(isTransferPending){
+                printTransfer(transfer);
+
+            }
+        }
+    }
+
+
+
     public Transfer[] getAllTransfer() {
         Transfer[]allTransfers=null;
         try{
@@ -98,26 +93,28 @@ public class UserService {
         }
         return allTransfers;
     }
-    public void promptTransferById(Long transferId){
+    public void promptTransferDetails(Long transferId){
         Transfer expectedTransfer=getTransferById(transferId);
 
-        String senderName=expectedTransfer.getAccountFrom().getAccountUser().getUsername();
-        String receiverName=expectedTransfer.getAccountTo().getAccountUser().getUsername();
+        String senderName=expectedTransfer.getSender().getAccountUser().getUsername();
+        String receiverName=expectedTransfer.getReceiver().getAccountUser().getUsername();
         String currentUserName=currentUser.getUser().getUsername();
 
-        System.out.println(" Id:    "+expectedTransfer.getTransferId()) ;
+        System.out.printf("Id:%12d %n",expectedTransfer.getTransferId()) ;
         if(senderName.equals(currentUserName)){
 
-        System.out.println(" From Me: "+senderName.toUpperCase());
-        System.out.println(" To:      " +receiverName.toUpperCase());
+        System.out.printf("From Me:%8s %nTo:%12s %nType:%10s %n",senderName.toUpperCase(),
+                receiverName.toUpperCase(),expectedTransfer.getType().getTransferType());
+
+
         }else
         {
-            System.out.println(" From : "+senderName.toUpperCase());
-            System.out.println(" To Me: " +receiverName.toUpperCase());
+            System.out.printf("From:%12s %nTo Me:%11s %nType:%10s %n",senderName.toUpperCase(),receiverName.toUpperCase(),"Request");
         }
-        System.out.println(" Type:  " +expectedTransfer.getType().getTransferType());
-        System.out.println(" Status: " +expectedTransfer.getStatus().getTransferStatus());
-        System.out.println(" Amount: $"+expectedTransfer.getAmount());
+        System.out.printf("Status:%12s %n",
+
+                expectedTransfer.getStatus().getTransferStatus());
+        System.out.println("Amount:    $"+expectedTransfer.getAmount());
 
 
     }
@@ -143,16 +140,34 @@ public class UserService {
 
 
     public Transfer sendTransfer(Long receiverId,BigDecimal transferAmount){
-     
+
         Transfer transfer=new Transfer();
-        transfer.setAccountFrom(getAccountByUserId(currentUser.getUser().getId()));
-        transfer.setAccountTo(getAccountByUserId(receiverId));
+        transfer.setSender(getAccountByUserId(currentUser.getUser().getId()));
+        transfer.setReceiver(getAccountByUserId(receiverId));
         transfer.setAmount(transferAmount);
         Transfer expected =null;
         try{
             ResponseEntity<Transfer>response=restTemplate.exchange(baseUrl+"transfers",HttpMethod.POST,
              makeTransferEntity(transfer),Transfer.class );
          expected= response.getBody();
+        } catch (RestClientResponseException ex) {
+            System.out.println("Request - Responce error: " + ex.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("Server not accessible. Check your connection or try again.");
+        }
+        return expected;
+    }
+    public Transfer requestTransfer(Long receiverId,BigDecimal transferAmount){
+
+        Transfer transfer=new Transfer();
+        transfer.setSender(getAccountByUserId(receiverId));
+        transfer.setReceiver(getAccountByUserId(currentUser.getUser().getId()));
+        transfer.setAmount(transferAmount);
+        Transfer expected =null;
+        try{
+            ResponseEntity<Transfer>response=restTemplate.exchange(baseUrl+"transfers",HttpMethod.POST,
+                    makeTransferEntity(transfer),Transfer.class );
+            expected= response.getBody();
         } catch (RestClientResponseException ex) {
             System.out.println("Request - Responce error: " + ex.getRawStatusCode());
         } catch (ResourceAccessException e) {
@@ -177,5 +192,21 @@ public class UserService {
 
     public void setCurrentUser(AuthenticatedUser currentUser) {
         this.currentUser = currentUser;
+    }
+
+
+    private void printTransfer(Transfer transfer){
+        String senderName=transfer.getSender().getAccountUser().getUsername();
+        String receiverName=transfer.getReceiver().getAccountUser().getUsername();
+        String formatted;
+        if(senderName.equals(currentUser.getUser().getUsername())){
+            formatted = String.format("%-10d   To: %-17s $%.2f", transfer.getTransferId(), receiverName.toUpperCase(),
+                    transfer.getAmount());
+        }
+        else{
+            formatted = String.format("%-10d From: %-17s $%.2f", transfer.getTransferId(), senderName.toUpperCase(),
+                    transfer.getAmount());
+
+        }System.out.println(formatted);
     }
 }
