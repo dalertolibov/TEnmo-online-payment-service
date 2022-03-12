@@ -124,6 +124,8 @@ public class App {
 
         BigDecimal transferAmount= consoleService.promptForBigDecimal("Enter amount:");
         Transfer transfer= userService.sendTransfer(userId,transferAmount);
+        if (transfer==null)
+            return;
         System.out.println("money sent to"+transfer.getTransferId());
 		
 	}
