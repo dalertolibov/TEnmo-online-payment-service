@@ -142,14 +142,14 @@ public class UserService {
 
     public Transfer sendTransfer(Long receiverId,BigDecimal transferAmount){
         Transfer transfer=new Transfer();
-        Account sender=new Account();
-        Account receiver=new Account();
-        sender.setAccountId(currentUser.getUser().getId());
-        receiver.setAccountId(receiverId);
-        transfer.setSender(sender);
-        transfer.setReceiver(receiver);
-//        transfer.setSender(getAccountByUserId(currentUser.getUser().getId()));
-//        transfer.setReceiver(getAccountByUserId(receiverId));
+//        Account sender=new Account();
+//        Account receiver=new Account();
+//        sender.setAccountId(currentUser.getUser().getId());
+//        receiver.setAccountId(receiverId);
+//        transfer.setSender(sender);
+//        transfer.setReceiver(receiver);
+      transfer.setSender(getAccountByUserId(currentUser.getUser().getId()));
+      transfer.setReceiver(getAccountByUserId(receiverId));
         transfer.setAmount(transferAmount);
         Transfer expected =null;
         try{
@@ -166,15 +166,15 @@ public class UserService {
     public Transfer requestTransfer(Long receiverId,BigDecimal transferAmount){
 
         Transfer transfer=new Transfer();
-        Account sender=new Account();
-        Account receiver=new Account();
-        receiver.setAccountId(currentUser.getUser().getId());
-        sender.setAccountId(receiverId);
-        transfer.setSender(sender);
-        transfer.setReceiver(receiver);
+//        Account sender=new Account();
+//        Account receiver=new Account();
+//        receiver.setAccountId(currentUser.getUser().getId());
+//        sender.setAccountId(receiverId);
+//        transfer.setSender(sender);
+//        transfer.setReceiver(receiver);
 
-//        transfer.setSender(getAccountByUserId(receiverId));
-//        transfer.setReceiver(getAccountByUserId(currentUser.getUser().getId()));
+       transfer.setSender(getAccountByUserId(receiverId));
+        transfer.setReceiver(getAccountByUserId(currentUser.getUser().getId()));
         transfer.setAmount(transferAmount);
         Transfer expected =null;
         try{
