@@ -100,21 +100,22 @@ public class UserService {
         String receiverName=expectedTransfer.getReceiver().getAccountUser().getUsername();
         String currentUserName=currentUser.getUser().getUsername();
 
-        System.out.printf("Id:%12d %n",expectedTransfer.getTransferId()) ;
+        System.out.printf("%-8s %d %n","Id:",expectedTransfer.getTransferId()) ;
         if(senderName.equals(currentUserName)){
+            System.out.printf("%-8s %s %n","From Me:",senderName.toUpperCase()) ;
+            System.out.printf("%-8s %s %n","To:",receiverName.toUpperCase()) ;
+            System.out.printf("%-8s %s %n","Type:",expectedTransfer.getType().getTransferType()) ;
 
-        System.out.printf("From Me:%8s %nTo:%12s %nType:%10s %n",senderName.toUpperCase(),
-                receiverName.toUpperCase(),expectedTransfer.getType().getTransferType());
-
-
+//
         }else
         {
-            System.out.printf("From:%12s %nTo Me:%11s %nType:%10s %n",senderName.toUpperCase(),receiverName.toUpperCase(),"Request");
-        }
-        System.out.printf("Status:%12s %n",
+            System.out.printf("%-8s %s %n","From:",senderName.toUpperCase()) ;
+            System.out.printf("%-8s %s %n","To Me:",receiverName.toUpperCase()) ;
+            System.out.printf("%-8s %s %n","Type:","Request") ;
 
-                expectedTransfer.getStatus().getTransferStatus());
-        System.out.println("Amount:    $"+expectedTransfer.getAmount());
+        }
+        System.out.printf("%-8s %s %n","Status:",expectedTransfer.getStatus().getTransferStatus());
+        System.out.printf("%-8s $%.2f %n","Amount:",expectedTransfer.getAmount());
 
 
     }
@@ -140,10 +141,15 @@ public class UserService {
 
 
     public Transfer sendTransfer(Long receiverId,BigDecimal transferAmount){
-
         Transfer transfer=new Transfer();
-        transfer.setSender(getAccountByUserId(currentUser.getUser().getId()));
-        transfer.setReceiver(getAccountByUserId(receiverId));
+        Account sender=new Account();
+        Account receiver=new Account();
+        sender.setAccountId(currentUser.getUser().getId());
+        receiver.setAccountId(receiverId);
+        transfer.setSender(sender);
+        transfer.setReceiver(receiver);
+//        transfer.setSender(getAccountByUserId(currentUser.getUser().getId()));
+//        transfer.setReceiver(getAccountByUserId(receiverId));
         transfer.setAmount(transferAmount);
         Transfer expected =null;
         try{
@@ -160,8 +166,15 @@ public class UserService {
     public Transfer requestTransfer(Long receiverId,BigDecimal transferAmount){
 
         Transfer transfer=new Transfer();
-        transfer.setSender(getAccountByUserId(receiverId));
-        transfer.setReceiver(getAccountByUserId(currentUser.getUser().getId()));
+        Account sender=new Account();
+        Account receiver=new Account();
+        receiver.setAccountId(currentUser.getUser().getId());
+        sender.setAccountId(receiverId);
+        transfer.setSender(sender);
+        transfer.setReceiver(receiver);
+
+//        transfer.setSender(getAccountByUserId(receiverId));
+//        transfer.setReceiver(getAccountByUserId(currentUser.getUser().getId()));
         transfer.setAmount(transferAmount);
         Transfer expected =null;
         try{

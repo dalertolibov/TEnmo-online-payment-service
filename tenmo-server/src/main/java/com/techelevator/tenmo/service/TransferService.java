@@ -35,7 +35,6 @@ public class TransferService {
     public Transfer createTransfer ( Transfer transfer, String userName) throws AccountNotFoundException, TransferNotFoundException, InsufficientFundException {
         Long senderAccountId=transfer.getSender().getAccountId();
         Long receiverAccountId=transfer.getReceiver().getAccountId();
-
         BigDecimal transferAmount= transfer.getAmount();
         Account senderAccount=accountDao.getAccountByAccountId(senderAccountId);
         Account receiverAccount=accountDao.getAccountByAccountId(receiverAccountId);
