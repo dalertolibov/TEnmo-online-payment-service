@@ -66,8 +66,9 @@ public class UserService {
     public List<Transfer> getPendingTransfers(){
         List<Transfer>allPendingTransfers=new ArrayList<>();
         for(Transfer transfer:getAllTransfer()){
-            boolean isTransferPending=transfer.getStatus().getTransferStatus().equals("Pending");
-            if(isTransferPending){
+            boolean isTransferPending = transfer.getStatus().getTransferStatus().equals("Pending");
+            boolean isRequestingFromMe = transfer.getSender().getAccountUser().getUsername().equals(currentUser.getUser().getUsername());
+            if(isTransferPending && isRequestingFromMe){
                 allPendingTransfers.add(transfer);
 
             }
@@ -151,6 +152,20 @@ public class UserService {
             System.out.println("Server not accessible. Check your connection or try again.");
         }
         return expected;
+    }
+    public Transfer updateTransfer(Transfer transfer){
+        Transfer updated=null;
+        try{
+            ResponseEntity<Transfer>response=restTemplate.exchange(baseUrl+"transfers",HttpMethod.POST,
+                    makeTransferEntity(transfer),Transfer.class );
+            updated= response.getBody();
+        } catch (RestClientResponseException ex) {
+            System.out.println("Request - Responce error: " + ex.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("Server not accessible. Check your connection or try again.");
+        }
+        return updated;
+
     }
 
 

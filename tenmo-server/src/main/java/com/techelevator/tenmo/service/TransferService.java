@@ -41,7 +41,35 @@ public class TransferService {
         BigDecimal senderBalance= senderAccount.getBalance();
         BigDecimal receiverBalance=receiverAccount.getBalance();
         Transfer createdTransfer=null;
-         if (senderBalance.compareTo(transferAmount) > 0 && senderAccount.getAccountUser().getUsername().equals(userName)){
+
+
+
+        if(transfer.getTransferId()!=null
+                && transfer.getStatus().getTransferStatus().equals("Approved")
+                && transfer.getType().getTransferType().equals("Request")
+                && senderAccount.getAccountUser().getUsername().equals(userName)){
+            accountDao.updateBalance(senderAccountId,senderBalance.subtract(transferAmount));
+            accountDao.updateBalance(receiverAccountId,receiverBalance.add(transferAmount));
+            transfer.setSender(senderAccount);
+            transfer.setReceiver(receiverAccount);
+            transfer.setType(transferTypeDao.getTransferType("Request"));
+            transfer.setStatus(transferStatusDao.getTransferStatus("Approved"));
+            createdTransfer=transferDao.updateTransfer(transfer.getTransferId(),transfer,userName);
+
+        }else if(transfer.getTransferId()!=null
+                && transfer.getStatus().getTransferStatus().equals("Rejected")
+                && transfer.getType().getTransferType().equals("Request")
+                && senderAccount.getAccountUser().getUsername().equals(userName)){
+            accountDao.updateBalance(senderAccountId,senderBalance.subtract(transferAmount));
+            accountDao.updateBalance(receiverAccountId,receiverBalance.add(transferAmount));
+            transfer.setSender(senderAccount);
+            transfer.setReceiver(receiverAccount);
+            transfer.setType(transferTypeDao.getTransferType("Request"));
+            transfer.setStatus(transferStatusDao.getTransferStatus("Rejected"));
+            createdTransfer=transferDao.updateTransfer(transfer.getTransferId(),transfer,userName);
+
+        }
+         else if (senderBalance.compareTo(transferAmount) > 0 && senderAccount.getAccountUser().getUsername().equals(userName)){
 
              accountDao.updateBalance(senderAccountId,senderBalance.subtract(transferAmount));
              accountDao.updateBalance(receiverAccountId,receiverBalance.add(transferAmount));
@@ -60,9 +88,7 @@ public class TransferService {
               createdTransfer=transferDao.createTransfer(transfer,userName);
 
         }
-
-
-         else {
+          else {
              throw new InsufficientFundException("You don't have enough TEmoney");
          }
          return createdTransfer;

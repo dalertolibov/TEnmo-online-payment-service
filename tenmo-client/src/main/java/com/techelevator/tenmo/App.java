@@ -114,9 +114,32 @@ public class App {
 
 	private void viewPendingRequests() {
         consoleService.promptForPendingRequests();
-        List<Transfer>pendingTransfers=userService.getPendingTransfers();
+        List<Transfer>pendingTransfers = userService.getPendingTransfers();
         transferHistoryPrinter(pendingTransfers);
-        consoleService.pause();
+       System.out.println("------------------------------");
+        consoleService.promptForAcceptOrReject();
+        int optionFromMenu=consoleService.promptForInt("Please choose an option:");
+        if(optionFromMenu==1 || optionFromMenu==2){
+            long transferId=consoleService.promptForInt("Please confirm account number");
+            Transfer transferFromDb = userService.getTransferById(transferId);
+            TransferStatus status=new TransferStatus();
+            if(transferFromDb!=null && optionFromMenu==2){
+                status.setTransferStatus("Rejected");
+                transferFromDb.setStatus(status);
+                userService.updateTransfer(transferFromDb);
+                System.out.println("Success!");
+                consoleService.pause();
+            }
+            else if(transferFromDb!=null && optionFromMenu==1){
+                status.setTransferStatus("Approved");
+                transferFromDb.setStatus(status);
+                userService.updateTransfer(transferFromDb);
+                System.out.println("Success!");
+                consoleService.pause();
+            }else consoleService.printErrorMessage();
+
+
+        }consoleService.printErrorMessage();
 
     }
 
