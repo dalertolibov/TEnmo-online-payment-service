@@ -7,6 +7,8 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserService {
 
@@ -36,15 +38,7 @@ public class UserService {
            System.out.println("Server not accessible. Check your connection or try again.");
        }
        return balance;
-
     }
-    public void promptAllUsers(){
-        for(User user:getAllUsers()){
-            String formattedString=String.format("%-10d %s",user.getId(),user.getUsername().toUpperCase());
-            System.out.println(formattedString);
-        }
-    }
-
 
     public User[] getAllUsers (){
         User[]allUsers=null;
@@ -60,23 +54,24 @@ public class UserService {
         return allUsers;
     }
 
-    public void promptForApprovedTransfers(){
-
+    public List<Transfer> getApprovedTransfers(){
+        List<Transfer>allApprovedTransfers=new ArrayList<>();
         for(Transfer transfer:getAllTransfer()){
             boolean isTransferApproved=transfer.getStatus().getTransferStatus().equals("Approved");
             if(isTransferApproved){
-                printTransfer(transfer);
+                allApprovedTransfers.add(transfer);
             }
-        }
+        }return allApprovedTransfers;
     }
-    public void promptForPendingTransfers(){
+    public List<Transfer> getPendingTransfers(){
+        List<Transfer>allPendingTransfers=new ArrayList<>();
         for(Transfer transfer:getAllTransfer()){
             boolean isTransferPending=transfer.getStatus().getTransferStatus().equals("Pending");
             if(isTransferPending){
-                printTransfer(transfer);
+                allPendingTransfers.add(transfer);
 
             }
-        }
+        }return allPendingTransfers;
     }
 
 
@@ -93,38 +88,45 @@ public class UserService {
         }
         return allTransfers;
     }
-    public void promptTransferDetails(Long transferId){
-        Transfer expectedTransfer=getTransferById(transferId);
-
-        String senderName=expectedTransfer.getSender().getAccountUser().getUsername();
-        String receiverName=expectedTransfer.getReceiver().getAccountUser().getUsername();
-        String currentUserName=currentUser.getUser().getUsername();
-
-        System.out.printf("%-8s %d %n","Id:",expectedTransfer.getTransferId()) ;
-        if(senderName.equals(currentUserName)){
-            System.out.printf("%-8s %s %n","From Me:",senderName.toUpperCase()) ;
-            System.out.printf("%-8s %s %n","To:",receiverName.toUpperCase()) ;
-            System.out.printf("%-8s %s %n","Type:",expectedTransfer.getType().getTransferType()) ;
-
+//    public void promptTransferDetails(Long transferId){
+//        Transfer expectedTransfer=getTransferById(transferId);
 //
-        }else
-        {
-            System.out.printf("%-8s %s %n","From:",senderName.toUpperCase()) ;
-            System.out.printf("%-8s %s %n","To Me:",receiverName.toUpperCase()) ;
-            System.out.printf("%-8s %s %n","Type:","Request") ;
-
-        }
-        System.out.printf("%-8s %s %n","Status:",expectedTransfer.getStatus().getTransferStatus());
-        System.out.printf("%-8s $%.2f %n","Amount:",expectedTransfer.getAmount());
-
-
-    }
+//        String senderName=expectedTransfer.getSender().getAccountUser().getUsername();
+//        String receiverName=expectedTransfer.getReceiver().getAccountUser().getUsername();
+//        String currentUserName=currentUser.getUser().getUsername();
+//
+//        System.out.printf("%-8s %d %n","Id:",expectedTransfer.getTransferId()) ;
+//        if(senderName.equals(currentUserName)){
+//            System.out.printf("%-8s %s %n","From Me:",senderName.toUpperCase()) ;
+//            System.out.printf("%-8s %s %n","To:",receiverName.toUpperCase()) ;
+//            System.out.printf("%-8s %s %n","Type:",expectedTransfer.getType().getTransferType()) ;
+//
+////
+//        }else
+//        {
+//            System.out.printf("%-8s %s %n","From:",senderName.toUpperCase()) ;
+//            System.out.printf("%-8s %s %n","To Me:",receiverName.toUpperCase()) ;
+//            System.out.printf("%-8s %s %n","Type:","Request") ;
+//
+//        }
+//        System.out.printf("%-8s %s %n","Status:",expectedTransfer.getStatus().getTransferStatus());
+//        System.out.printf("%-8s $%.2f %n","Amount:",expectedTransfer.getAmount());
+//
+//
+//    }
     public Transfer getTransferById(Long transferId){
-
-            ResponseEntity<Transfer>response=restTemplate.exchange(baseUrl+"transfers/"+transferId,
+        Transfer transfer=null;
+        try{ResponseEntity<Transfer>response=restTemplate.exchange(baseUrl+"transfers/"+transferId,
                     HttpMethod.GET,makeAuthEntity(),Transfer.class);
-            return  response.getBody();
+            transfer= response.getBody();
+        } catch (RestClientResponseException ex) {
+            System.out.println("Request - Responce error: " + ex.getRawStatusCode());
+        } catch (ResourceAccessException e) {
+            System.out.println("Server not accessible. Check your connection or try again.");
+        }
+        return transfer;
     }
+
     public Account getAccountByUserId(Long userId){
         Account account=null;
         try{
@@ -142,14 +144,8 @@ public class UserService {
 
     public Transfer sendTransfer(Long receiverId,BigDecimal transferAmount){
         Transfer transfer=new Transfer();
-//        Account sender=new Account();
-//        Account receiver=new Account();
-//        sender.setAccountId(currentUser.getUser().getId());
-//        receiver.setAccountId(receiverId);
-//        transfer.setSender(sender);
-//        transfer.setReceiver(receiver);
-      transfer.setSender(getAccountByUserId(currentUser.getUser().getId()));
-      transfer.setReceiver(getAccountByUserId(receiverId));
+        transfer.setSender(getAccountByUserId(currentUser.getUser().getId()));
+        transfer.setReceiver(getAccountByUserId(receiverId));
         transfer.setAmount(transferAmount);
         Transfer expected =null;
         try{
@@ -166,14 +162,7 @@ public class UserService {
     public Transfer requestTransfer(Long receiverId,BigDecimal transferAmount){
 
         Transfer transfer=new Transfer();
-//        Account sender=new Account();
-//        Account receiver=new Account();
-//        receiver.setAccountId(currentUser.getUser().getId());
-//        sender.setAccountId(receiverId);
-//        transfer.setSender(sender);
-//        transfer.setReceiver(receiver);
-
-       transfer.setSender(getAccountByUserId(receiverId));
+        transfer.setSender(getAccountByUserId(receiverId));
         transfer.setReceiver(getAccountByUserId(currentUser.getUser().getId()));
         transfer.setAmount(transferAmount);
         Transfer expected =null;
@@ -208,18 +197,18 @@ public class UserService {
     }
 
 
-    private void printTransfer(Transfer transfer){
-        String senderName=transfer.getSender().getAccountUser().getUsername();
-        String receiverName=transfer.getReceiver().getAccountUser().getUsername();
-        String formatted;
-        if(senderName.equals(currentUser.getUser().getUsername())){
-            formatted = String.format("%-10d   To: %-17s $%.2f", transfer.getTransferId(), receiverName.toUpperCase(),
-                    transfer.getAmount());
-        }
-        else{
-            formatted = String.format("%-10d From: %-17s $%.2f", transfer.getTransferId(), senderName.toUpperCase(),
-                    transfer.getAmount());
-
-        }System.out.println(formatted);
-    }
+//    private void printTransfer(Transfer transfer){
+//        String senderName=transfer.getSender().getAccountUser().getUsername();
+//        String receiverName=transfer.getReceiver().getAccountUser().getUsername();
+//        String formatted;
+//        if(senderName.equals(currentUser.getUser().getUsername())){
+//            formatted = String.format("%-10d   To: %-17s $%.2f", transfer.getTransferId(), receiverName.toUpperCase(),
+//                    transfer.getAmount());
+//        }
+//        else{
+//            formatted = String.format("%-10d From: %-17s $%.2f", transfer.getTransferId(), senderName.toUpperCase(),
+//                    transfer.getAmount());
+//
+//        }System.out.println(formatted);
+//    }
 }

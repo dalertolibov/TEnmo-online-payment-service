@@ -1,6 +1,8 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.UserCredentials;
 
 import java.math.BigDecimal;
@@ -118,5 +120,44 @@ public class ConsoleService {
     public void printErrorMessage() {
         System.out.println("An error occurred. Check the log for details.");
     }
+        public  void printTransfer(Transfer transfer, AuthenticatedUser currentUser){
+        String senderName=transfer.getSender().getAccountUser().getUsername();
+        String receiverName=transfer.getReceiver().getAccountUser().getUsername();
+        String formatted;
+        if(senderName.equals(currentUser.getUser().getUsername())){
+            formatted = String.format("%-10d   To: %-17s $%.2f", transfer.getTransferId(), receiverName.toUpperCase(),
+                    transfer.getAmount());
+        }
+        else{
+            formatted = String.format("%-10d From: %-17s $%.2f", transfer.getTransferId(), senderName.toUpperCase(),
+                    transfer.getAmount());
+
+        }System.out.println(formatted);
+    }
+    public void promptTransferDetails(Transfer transfer, AuthenticatedUser currentUser){
+//        Transfer expectedTransfer=getTransferById(transferId);
+        String senderName=transfer.getSender().getAccountUser().getUsername();
+        String receiverName=transfer.getReceiver().getAccountUser().getUsername();
+        String currentUserName=currentUser.getUser().getUsername();
+
+        System.out.printf("%-8s %d %n","Id:",transfer.getTransferId()) ;
+        if(senderName.equals(currentUserName)){
+            System.out.printf("%-8s %s %n","From Me:",senderName.toUpperCase()) ;
+            System.out.printf("%-8s %s %n","To:",receiverName.toUpperCase()) ;
+            System.out.printf("%-8s %s %n","Type:",transfer.getType().getTransferType()) ;
+
+
+        }else
+        {
+            System.out.printf("%-8s %s %n","From:",senderName.toUpperCase()) ;
+            System.out.printf("%-8s %s %n","To Me:",receiverName.toUpperCase()) ;
+            System.out.printf("%-8s %s %n","Type:","Request") ;
+
+       }
+        System.out.printf("%-8s %s %n","Status:",transfer.getStatus().getTransferStatus());
+       System.out.printf("%-8s $%.2f %n","Amount:",transfer.getAmount());
+
+
+   }
 
 }
