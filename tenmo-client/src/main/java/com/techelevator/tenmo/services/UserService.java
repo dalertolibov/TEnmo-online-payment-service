@@ -187,18 +187,5 @@ public class UserService {
     }
 
 
-//    private void printTransfer(Transfer transfer){
-//        String senderName=transfer.getSender().getAccountUser().getUsername();
-//        String receiverName=transfer.getReceiver().getAccountUser().getUsername();
-//        String formatted;
-//        if(senderName.equals(currentUser.getUser().getUsername())){
-//            formatted = String.format("%-10d   To: %-17s $%.2f", transfer.getTransferId(), receiverName.toUpperCase(),
-//                    transfer.getAmount());
-//        }
-//        else{
-//            formatted = String.format("%-10d From: %-17s $%.2f", transfer.getTransferId(), senderName.toUpperCase(),
-//                    transfer.getAmount());
-//
-//        }System.out.println(formatted);
-//    }
+
 }

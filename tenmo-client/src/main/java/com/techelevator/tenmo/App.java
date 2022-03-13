@@ -97,6 +97,7 @@ public class App {
         BigDecimal balance=userService.getBalance();
         if(balance!=null){
         System.out.println("\nYour current account balance is: $"+balance);
+        consoleService.pause();
         }
         else
             consoleService.printErrorMessage();
@@ -115,33 +116,28 @@ public class App {
 	private void viewPendingRequests() {
         consoleService.promptForPendingRequests();
         List<Transfer>pendingTransfers = userService.getPendingTransfers();
-        transferHistoryPrinter(pendingTransfers);
-       System.out.println("------------------------------");
-        consoleService.promptForAcceptOrReject();
+        if(pendingTransfers.isEmpty()){
+            System.out.println("You have no pending transfers");
+            consoleService.pause();
+        }else{
+            for(Transfer transfer:pendingTransfers){
+                consoleService.printTransfer(transfer,currentUser);
+            }
+            consoleService.promptForAcceptOrRejectBanner();
         int optionFromMenu=consoleService.promptForInt("Please choose an option:");
         if(optionFromMenu==1 || optionFromMenu==2){
-            long transferId=consoleService.promptForInt("Please confirm account number");
+          long transferId=consoleService.promptForInt("Please confirm account number:");
             Transfer transferFromDb = userService.getTransferById(transferId);
-            TransferStatus status=new TransferStatus();
+
             if(transferFromDb!=null && optionFromMenu==2){
-                status.setTransferStatus("Rejected");
-                transferFromDb.setStatus(status);
-                userService.updateTransfer(transferFromDb);
-                System.out.println("Success!");
-                consoleService.pause();
+            setTransferStatus("Rejected",transferFromDb);
             }
             else if(transferFromDb!=null && optionFromMenu==1){
-                status.setTransferStatus("Approved");
-                transferFromDb.setStatus(status);
-                userService.updateTransfer(transferFromDb);
-                System.out.println("Success!");
-                consoleService.pause();
-            }else consoleService.printErrorMessage();
-
-
-        }consoleService.printErrorMessage();
-
+                setTransferStatus("Approved",transferFromDb);
+            }else consoleService.printErrorMessage();}
+        }
     }
+
 
 
 
@@ -193,13 +189,13 @@ public class App {
             }
         }else consoleService.printErrorMessage();
     }
-
-
     private void transferHistoryPrinter(List<Transfer>transfers){
         if(transfers.size()>0){
+
             for(Transfer transfer:transfers){
                 consoleService.printTransfer(transfer,currentUser);
             }
+            System.out.println();
             long transferId=consoleService.promptForInt("Please enter transfer ID to view details (0 to cancel): ");
             if(transferId==0){
                 return;
@@ -212,5 +208,13 @@ public class App {
                     consoleService.printErrorMessage();
             }else consoleService.printErrorMessage();
         }else System.out.println("You don't have any transfers");
+    }
+    private void setTransferStatus(String transferStatus,Transfer transferFromDb){
+        TransferStatus status=new TransferStatus();
+        status.setTransferStatus(transferStatus);
+        transferFromDb.setStatus(status);
+        userService.updateTransfer(transferFromDb);
+        System.out.println("Success!");
+        consoleService.pause();
     }
 }

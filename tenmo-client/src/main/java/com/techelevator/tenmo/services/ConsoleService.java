@@ -70,11 +70,12 @@ public class ConsoleService {
                 "ID          To                     Amount\n" +
                 "-------------------------------------------");
     }
-    public void promptForAcceptOrReject(){
+    public void promptForAcceptOrRejectBanner(){
+        System.out.println("-------------------------------------------");
         System.out.println("1: Approve\n" +
                 "2: Reject\n" +
                 "0: Don't approve or reject\n" +
-                "---------");
+                "-------------------------------------------");
     }
 
     public UserCredentials promptForCredentials() {
@@ -118,7 +119,7 @@ public class ConsoleService {
     }
 
     public void printErrorMessage() {
-        System.out.println("An error occurred. Check the log for details.");
+        System.out.println("Invalid Selection.");
     }
         public  void printTransfer(Transfer transfer, AuthenticatedUser currentUser){
         String senderName=transfer.getSender().getAccountUser().getUsername();

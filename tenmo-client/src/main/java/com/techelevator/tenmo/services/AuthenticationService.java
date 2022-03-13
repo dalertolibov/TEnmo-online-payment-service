@@ -31,6 +31,7 @@ public class AuthenticationService {
             user = response.getBody();
         } catch (RestClientResponseException ex) {
             System.out.println("Request - Responce error: " + ex.getRawStatusCode());
+
         } catch (ResourceAccessException e) {
             System.out.println("Server not accessible. Check your connection or try again.");
         }
@@ -45,6 +46,7 @@ public class AuthenticationService {
             success = true;
         } catch (RestClientResponseException ex) {
             System.out.println("Request - Responce error: " + ex.getRawStatusCode());
+
         } catch (ResourceAccessException e) {
             System.out.println("Server not accessible. Check your connection or try again.");
         }
