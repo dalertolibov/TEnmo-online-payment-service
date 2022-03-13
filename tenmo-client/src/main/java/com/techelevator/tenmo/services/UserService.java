@@ -88,32 +88,7 @@ public class UserService {
         }
         return allTransfers;
     }
-//    public void promptTransferDetails(Long transferId){
-//        Transfer expectedTransfer=getTransferById(transferId);
-//
-//        String senderName=expectedTransfer.getSender().getAccountUser().getUsername();
-//        String receiverName=expectedTransfer.getReceiver().getAccountUser().getUsername();
-//        String currentUserName=currentUser.getUser().getUsername();
-//
-//        System.out.printf("%-8s %d %n","Id:",expectedTransfer.getTransferId()) ;
-//        if(senderName.equals(currentUserName)){
-//            System.out.printf("%-8s %s %n","From Me:",senderName.toUpperCase()) ;
-//            System.out.printf("%-8s %s %n","To:",receiverName.toUpperCase()) ;
-//            System.out.printf("%-8s %s %n","Type:",expectedTransfer.getType().getTransferType()) ;
-//
-////
-//        }else
-//        {
-//            System.out.printf("%-8s %s %n","From:",senderName.toUpperCase()) ;
-//            System.out.printf("%-8s %s %n","To Me:",receiverName.toUpperCase()) ;
-//            System.out.printf("%-8s %s %n","Type:","Request") ;
-//
-//        }
-//        System.out.printf("%-8s %s %n","Status:",expectedTransfer.getStatus().getTransferStatus());
-//        System.out.printf("%-8s $%.2f %n","Amount:",expectedTransfer.getAmount());
-//
-//
-//    }
+
     public Transfer getTransferById(Long transferId){
         Transfer transfer=null;
         try{ResponseEntity<Transfer>response=restTemplate.exchange(baseUrl+"transfers/"+transferId,

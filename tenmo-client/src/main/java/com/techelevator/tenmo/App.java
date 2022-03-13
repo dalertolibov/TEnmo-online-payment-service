@@ -81,7 +81,7 @@ public class App {
             } else if (menuSelection == 4) {
                      sendBucks();
             } else if (menuSelection == 5) {
- //               requestBucks();
+                    requestBucks();
             } else if (menuSelection == 0) {
                 continue;
             } else {
@@ -93,7 +93,7 @@ public class App {
 
 	private void viewCurrentBalance() {
 
-        //String token=currentUser.getToken();
+
         BigDecimal balance=userService.getBalance();
         if(balance!=null){
         System.out.println("\nYour current account balance is: $"+balance);
@@ -102,7 +102,7 @@ public class App {
             consoleService.printErrorMessage();
     }
 
- //
+
 
 
     private void viewTransferHistory() {
@@ -126,13 +126,8 @@ public class App {
 
 	private void sendBucks() {
         consoleService.promptForUsersHeader();
-        User[]allUser= userService.getAllUsers();
-        if(allUser!=null){
-            for(User user:allUser){
-                String formattedString=String.format("%-10d %s",user.getId(),user.getUsername().toUpperCase());
-                System.out.println(formattedString);
-            }
-        }else consoleService.printErrorMessage();
+        printListOfUsers(userService.getAllUsers());
+
         long userId= (consoleService.promptForInt("Enter ID of user you are sending to (0 to cancel):"));
         if(userId==0){
             return;
@@ -141,13 +136,42 @@ public class App {
             Transfer returnedTransfer= userService.sendTransfer(userId,transferAmount);
             if(returnedTransfer!=null){
                 System.out.println("\nTransaction Successfully Completed!\n" +
-                        "Transaction number: "+returnedTransfer.getTransferId()+"\nReceiver: "+
-                        returnedTransfer.getReceiver().getAccountUser().getUsername().toUpperCase());
+                        "Transaction number: "+returnedTransfer.getTransferId());
 
             }else consoleService.printErrorMessage();
 
         }else consoleService.printErrorMessage();
     }
+
+	private void requestBucks() {
+        consoleService.promptForUsersHeader();
+        printListOfUsers(userService.getAllUsers());
+        long userId = (consoleService.promptForInt("Enter ID of user you are requesting from (0 to cancel):"));
+        if (userId == 0) {
+                return;
+        } else if (userId > 0) {
+                BigDecimal transferAmount = consoleService.promptForBigDecimal("Enter amount:");
+                Transfer returnedTransfer = userService.requestTransfer(userId, transferAmount);
+                if (returnedTransfer != null) {
+                    System.out.println("\nTransaction Successfully Completed!\n" +
+                            "Transaction number: " + returnedTransfer.getTransferId());
+                } else consoleService.printErrorMessage();
+
+        } else consoleService.printErrorMessage();
+
+    }
+
+
+    public void printListOfUsers(User[]allUsers){
+        if(allUsers!=null){
+            for(User user:allUsers){
+                String formattedString=String.format("%-10d %s",user.getId(),user.getUsername().toUpperCase());
+                System.out.println(formattedString);
+            }
+        }else consoleService.printErrorMessage();
+    }
+
+
     private void transferHistoryPrinter(List<Transfer>transfers){
         if(transfers.size()>0){
             for(Transfer transfer:transfers){
@@ -163,24 +187,7 @@ public class App {
                     consoleService.promptTransferDetails(transferFromDb,currentUser);
                 }else
                     consoleService.printErrorMessage();
-
-
             }else consoleService.printErrorMessage();
-
         }else System.out.println("You don't have any transfers");
     }
-//
-//	private void requestBucks() {
-//        consoleService.promptForUsersHeader();
-//		userService.promptAllUsers();
-//        long userId= (consoleService.promptForInt("Enter ID of user you are requesting from (0 to cancel):"));
-//        if(userId==0){
-//            return;
-//        }
-//        BigDecimal transferAmount= consoleService.promptForBigDecimal("Enter amount:");
-//        Transfer transfer= userService.requestTransfer(userId,transferAmount);
-//
-//	}
-
-
 }

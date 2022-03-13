@@ -144,20 +144,17 @@ public class ConsoleService {
         if(senderName.equals(currentUserName)){
             System.out.printf("%-8s %s %n","From Me:",senderName.toUpperCase()) ;
             System.out.printf("%-8s %s %n","To:",receiverName.toUpperCase()) ;
-            System.out.printf("%-8s %s %n","Type:",transfer.getType().getTransferType()) ;
-
-
         }else
         {
             System.out.printf("%-8s %s %n","From:",senderName.toUpperCase()) ;
             System.out.printf("%-8s %s %n","To Me:",receiverName.toUpperCase()) ;
-            System.out.printf("%-8s %s %n","Type:","Request") ;
-
-       }
+        //    System.out.printf("%-8s %s %n","Type:","Request") ;
+        }    System.out.printf("%-8s %s %n","Type:",transfer.getType().getTransferType()) ;
         System.out.printf("%-8s %s %n","Status:",transfer.getStatus().getTransferStatus());
        System.out.printf("%-8s $%.2f %n","Amount:",transfer.getAmount());
 
 
    }
+
 
 }
