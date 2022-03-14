@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Component
@@ -44,7 +45,7 @@ public class TransferService {
     public Transfer createTransfer ( Transfer transfer, String userName) throws AccountNotFoundException, TransferNotFoundException, InsufficientFundException {
         Long senderAccountIdFromClient =  transfer.getSender().getAccountId();
         Long receiverAccountIdFromClient = transfer.getReceiver().getAccountId();
-        BigDecimal transferAmount = transfer.getAmount();
+        BigDecimal transferAmount = transfer.getAmount().setScale(2, RoundingMode.DOWN);
         Account senderAccount = accountDao.getAccountByAccountId(senderAccountIdFromClient);
         Account receiverAccount = accountDao.getAccountByAccountId(receiverAccountIdFromClient);
         BigDecimal senderBalance = senderAccount.getBalance();
